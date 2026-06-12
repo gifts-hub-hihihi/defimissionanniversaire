@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Le Défi de Clem - Marry Poppins</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="game-wrap">
+    <header>
+      <h1>Le Défi de Clem</h1>
+      <p>Clem, prouve que tu es digne d’être aussi fabuleuse que Marry Poppins : vole avec ton parapluie, évite les cheminées et récupère les enfants perdus.</p>
+    </header>
+
+    <section class="hud">
+      <div>Score : <span id="score">0</span></div>
+      <div>Objectif : <span id="target">150</span></div>
+      <div>Meilleur : <span id="best">0</span></div>
+      <div>Son : <span id="soundStatus">activé</span></div>
+    </section>
+
+    <canvas id="game" width="900" height="500" aria-label="Jeu Marry Poppins pour Clem"></canvas>
+
+    <div class="controls">
+      <button id="startBtn">Commencer</button>
+      <button id="pauseBtn">Pause</button>
+      <button id="restartBtn">Recommencer</button>
+      <button id="soundBtn">Couper le son</button>
+    </div>
+
+    <p class="help">
+      Contrôles : ↑ / Espace / clic / toucher pour monter. Le score augmente seulement quand Clem récupère un enfant. À la victoire, le jeu lance ta musique d’anniversaire personnalisée.
+    </p>
+
+    <p class="music-note">
+      Pour ajouter ta musique : mets ton fichier dans <code>assets/anniversaire-clem.mp3</code> avant de publier sur GitHub Pages.
+    </p>
+
+    <audio id="birthdayMusic" src="assets/anniversaire-clem.mp3" preload="auto"></audio>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>
