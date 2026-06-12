@@ -1,6 +1,1 @@
-Mets ici ta musique d'anniversaire personnalisée.
 
-Nom attendu par le jeu : anniversaire-clem.mp3
-Chemin exact : assets/anniversaire-clem.mp3
-
-Quand Clem gagne, le jeu essaie automatiquement de lancer ce fichier.
