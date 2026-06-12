@@ -13,7 +13,7 @@ const birthdayMusic = document.getElementById('birthdayMusic');
 const W = canvas.width;
 const H = canvas.height;
 const groundY = H - 58;
-const TARGET_SCORE = 150;
+const TARGET_SCORE = 15;
 
 let best = Number(localStorage.getItem('marry-poppins-best') || 0);
 let score = 0;
@@ -186,7 +186,7 @@ function update() {
     const py = player.y + player.h / 2;
     if (Math.hypot(px - k.x, py - k.y) < 44) {
       k.taken = true;
-      score += 10;
+      score += 1;
       playRescueSound();
       updateScore();
     }
@@ -377,7 +377,7 @@ function drawMessage() {
     ctx.font = 'bold 40px Georgia';
     ctx.fillText('Bravo Clem !', W / 2, H / 2 - 102);
     ctx.font = 'bold 25px Georgia';
-    ctx.fillText('Tu as récupéré tous les enfants perdus.', W / 2, H / 2 - 58);
+    ctx.fillText('Tu as sauvé les 15 enfants perdus.', W / 2, H / 2 - 58);
     ctx.fillText('Tu es officiellement digne de Marry Poppins.', W / 2, H / 2 - 24);
     ctx.font = 'bold 35px Georgia';
     ctx.fillText('Bon anniversaire ! 🎂', W / 2, H / 2 + 34);
