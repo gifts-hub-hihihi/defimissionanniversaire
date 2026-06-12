@@ -9,13 +9,17 @@
 <body>
   <main class="game-wrap">
     <header>
-      <h1>Le Défi de Clem</h1>
-      <p>Clem, prouve que tu es digne d’être aussi fabuleuse que Marry Poppins : vole avec ton parapluie, évite les cheminées et récupère les enfants perdus.</p>
+      <h1>Bravo Clem, tu as trouvé le site ! ☂️</h1>
+      <p>
+        Maintenant, si tu veux découvrir ta musique d’anniversaire,
+        tu dois sauver <strong>15 enfants</strong> pour prouver que tu es digne
+        de Marry Poppins.
+      </p>
     </header>
 
     <section class="hud">
       <div>Score : <span id="score">0</span></div>
-      <div>Objectif : <span id="target">150</span></div>
+      <div>Objectif : <span id="target">15</span></div>
       <div>Meilleur : <span id="best">0</span></div>
       <div>Son : <span id="soundStatus">activé</span></div>
     </section>
@@ -23,16 +27,17 @@
     <canvas id="game" width="900" height="500" aria-label="Jeu Marry Poppins pour Clem"></canvas>
 
     <div class="controls">
-      <button id="startBtn">Commencer</button>
+      <button id="startBtn">Commencer la mission</button>
       <button id="pauseBtn">Pause</button>
       <button id="restartBtn">Recommencer</button>
       <button id="soundBtn">Couper le son</button>
     </div>
 
     <p class="help">
-      Contrôles : ↑ / Espace / clic / toucher pour monter. Le score augmente seulement quand Clem récupère un enfant. À la victoire, le jeu lance ta musique d’anniversaire personnalisée.
+      Contrôles : ↑ / Espace / clic / toucher pour monter.
+      Le score augmente seulement quand Clem sauve un enfant.
+      À 15 enfants sauvés, sa musique d’anniversaire se lance.
     </p>
-
 
     <audio id="birthdayMusic" src="assets/anniversaire-clem.mp3" preload="auto"></audio>
   </main>
