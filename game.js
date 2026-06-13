@@ -1,9 +1,10 @@
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
+
 const scoreEl = document.getElementById('score');
-const bestEl = document.getElementById('best');
 const targetEl = document.getElementById('target');
 const soundStatusEl = document.getElementById('soundStatus');
+
 const startBtn = document.getElementById('startBtn');
 const pauseBtn = document.getElementById('pauseBtn');
 const restartBtn = document.getElementById('restartBtn');
@@ -15,7 +16,6 @@ const H = canvas.height;
 const groundY = H - 58;
 const TARGET_SCORE = 5;
 
-let best = Number(localStorage.getItem('marry-poppins-best') || 0);
 let score = 0;
 let speed = 4;
 let frame = 0;
@@ -23,12 +23,12 @@ let running = false;
 let paused = false;
 let gameOver = false;
 let victory = false;
-let lift = false;
 let soundEnabled = true;
+
 let chimneys = [];
 let children = [];
-let audioContext = null;
 let confetti = [];
+let audioContext = null;
 
 const player = {
   x: 145,
@@ -38,7 +38,6 @@ const player = {
   vy: 0,
 };
 
-bestEl.textContent = best;
 targetEl.textContent = TARGET_SCORE;
 
 function getAudioContext() {
@@ -51,15 +50,20 @@ function getAudioContext() {
 
 function beep(frequency, duration = 0.08, type = 'sine', volume = 0.08) {
   if (!soundEnabled) return;
+
   const audio = getAudioContext();
   const osc = audio.createOscillator();
   const gain = audio.createGain();
+
   osc.type = type;
   osc.frequency.value = frequency;
+
   gain.gain.setValueAtTime(volume, audio.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.001, audio.currentTime + duration);
+
   osc.connect(gain);
   gain.connect(audio.destination);
+
   osc.start();
   osc.stop(audio.currentTime + duration);
 }
@@ -81,10 +85,12 @@ function playVictorySound() {
 
 function playBirthdayMusic() {
   if (!soundEnabled) return;
+
   birthdayMusic.currentTime = 0;
   birthdayMusic.volume = 0.85;
+
   birthdayMusic.play().catch(() => {
-    // Si aucun MP3 n'est encore ajouté, ou si le navigateur bloque la lecture, on garde juste le jingle.
+    console.log("La musique d'anniversaire n'a pas pu se lancer.");
   });
 }
 
@@ -97,28 +103,41 @@ function resetGame() {
   score = 0;
   speed = 4;
   frame = 0;
+
   chimneys = [];
   children = [];
+  confetti = [];
+
   player.y = 215;
   player.vy = 0;
+
   gameOver = false;
   victory = false;
   paused = false;
   running = true;
+
   scoreEl.textContent = score;
   stopBirthdayMusic();
+
+  document.body.classList.remove('big-birthday-boom');
 }
 
 function startGame() {
   getAudioContext();
-  if (!running || gameOver || victory) resetGame();
+
+  if (!running || gameOver || victory) {
+    resetGame();
+  }
+
   running = true;
   paused = false;
+
   beep(440, 0.07, 'sine', 0.04);
 }
 
 function togglePause() {
   if (!running || gameOver || victory) return;
+
   paused = !paused;
   beep(paused ? 260 : 520, 0.07, 'sine', 0.04);
 }
@@ -126,15 +145,26 @@ function togglePause() {
 function toggleSound() {
   soundEnabled = !soundEnabled;
   birthdayMusic.muted = !soundEnabled;
+
   soundStatusEl.textContent = soundEnabled ? 'activé' : 'coupé';
   soundBtn.textContent = soundEnabled ? 'Couper le son' : 'Remettre le son';
-  if (!soundEnabled) stopBirthdayMusic();
-  else beep(640, 0.08, 'sine', 0.05);
+
+  if (!soundEnabled) {
+    stopBirthdayMusic();
+  } else {
+    beep(640, 0.08, 'sine', 0.05);
+  }
 }
 
 function addChimney() {
   const h = 80 + Math.random() * 115;
-  chimneys.push({ x: W + 20, y: groundY - h, w: 52, h });
+
+  chimneys.push({
+    x: W + 20,
+    y: groundY - h,
+    w: 52,
+    h,
+  });
 }
 
 function addChild() {
@@ -153,7 +183,7 @@ function update() {
   frame++;
   speed += 0.0018;
 
-  player.vy += lift ? -0.42 : 0.26;
+  player.vy += 0.26;
   player.vy = Math.max(-7.2, Math.min(6.4, player.vy));
   player.y += player.vy;
 
@@ -162,12 +192,15 @@ function update() {
     player.vy = 0;
   }
 
-  if (player.y + player.h > groundY) endGame();
+  if (player.y + player.h > groundY) {
+    endGame();
+  }
 
   if (frame % 92 === 0) addChimney();
   if (frame % 118 === 0) addChild();
 
   chimneys.forEach(c => c.x -= speed);
+
   children.forEach(k => {
     k.x -= speed * 1.04;
     k.y += Math.sin(frame * 0.06 + k.bob) * 0.35;
@@ -177,7 +210,18 @@ function update() {
   children = children.filter(k => k.x + k.r > -10 && !k.taken);
 
   chimneys.forEach(c => {
-    if (rectsOverlap(player.x + 8, player.y + 10, player.w - 16, player.h - 8, c.x, c.y, c.w, c.h)) {
+    if (
+      rectsOverlap(
+        player.x + 8,
+        player.y + 10,
+        player.w - 16,
+        player.h - 8,
+        c.x,
+        c.y,
+        c.w,
+        c.h
+      )
+    ) {
       endGame();
     }
   });
@@ -185,6 +229,7 @@ function update() {
   children.forEach(k => {
     const px = player.x + player.w / 2;
     const py = player.y + player.h / 2;
+
     if (Math.hypot(px - k.x, py - k.y) < 44) {
       k.taken = true;
       score += 1;
@@ -196,38 +241,45 @@ function update() {
 
 function updateScore() {
   scoreEl.textContent = score;
-  if (score > best) {
-    best = score;
-    bestEl.textContent = best;
-    localStorage.setItem('marry-poppins-best', best);
+
+  if (score >= TARGET_SCORE && !victory) {
+    winGame();
   }
-  if (score >= TARGET_SCORE && !victory) winGame();
 }
 
 function winGame() {
   victory = true;
   running = false;
+
   playVictorySound();
   playBirthdayMusic();
   launchConfetti();
   bigBirthdayBoom();
 }
+
 function endGame() {
   if (gameOver || victory) return;
+
   gameOver = true;
   running = false;
+
   playCrashSound();
 }
 
 function rectsOverlap(x1, y1, w1, h1, x2, y2, w2, h2) {
-  return x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2;
+  return x1 < x2 + w2 &&
+         x1 + w1 > x2 &&
+         y1 < y2 + h2 &&
+         y1 + h1 > y2;
 }
 
 function drawSky() {
-  const grad = ctx.createLinearGradient(0, 0, 0, H);
-  grad.addColorStop(0, '#8bc8ff');
-  grad.addColorStop(0.7, '#ffe8bb');
-  grad.addColorStop(1, '#d79a60');
+  const grad = ctx.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0, '#ff8ec7');
+  grad.addColorStop(0.35, '#ffd166');
+  grad.addColorStop(0.7, '#7bdff2');
+  grad.addColorStop(1, '#b2f7ef');
+
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, H);
 
@@ -237,6 +289,7 @@ function drawSky() {
 
   ctx.fillStyle = '#6b432d';
   ctx.fillRect(0, groundY, W, H - groundY);
+
   ctx.fillStyle = '#8b5a39';
   for (let x = -20; x < W + 40; x += 80) {
     ctx.fillRect(x, groundY + 10, 54, 12);
@@ -247,6 +300,7 @@ function drawCloud(x, y, scale) {
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(scale, scale);
+
   ctx.fillStyle = 'rgba(255, 255, 255, 0.78)';
   ctx.beginPath();
   ctx.arc(0, 16, 24, 0, Math.PI * 2);
@@ -254,6 +308,7 @@ function drawCloud(x, y, scale) {
   ctx.arc(64, 16, 25, 0, Math.PI * 2);
   ctx.fillRect(-8, 16, 88, 24);
   ctx.fill();
+
   ctx.restore();
 }
 
@@ -266,6 +321,7 @@ function drawPlayer() {
   ctx.arc(x + 31, y + 12, 42, Math.PI, 0);
   ctx.lineTo(x - 11, y + 12);
   ctx.fill();
+
   ctx.strokeStyle = '#3d1d25';
   ctx.lineWidth = 3;
   ctx.stroke();
@@ -304,8 +360,10 @@ function drawChimneys() {
   chimneys.forEach(c => {
     ctx.fillStyle = '#7d3f2d';
     ctx.fillRect(c.x, c.y, c.w, c.h);
+
     ctx.fillStyle = '#5a2a20';
     ctx.fillRect(c.x - 7, c.y - 12, c.w + 14, 15);
+
     ctx.fillStyle = 'rgba(50, 45, 45, 0.2)';
     ctx.beginPath();
     ctx.arc(c.x + 18, c.y - 26, 12, 0, Math.PI * 2);
@@ -365,19 +423,20 @@ function drawChild(x, y) {
 
   ctx.restore();
 }
+
 function launchConfetti() {
   confetti = [];
 
-  for (let i = 0; i < 180; i++) {
+  for (let i = 0; i < 220; i++) {
     confetti.push({
       x: W / 2,
       y: H / 2,
-      vx: (Math.random() - 0.5) * 12,
-      vy: (Math.random() - 0.8) * 12,
-      size: 5 + Math.random() * 8,
+      vx: (Math.random() - 0.5) * 14,
+      vy: (Math.random() - 0.8) * 14,
+      size: 5 + Math.random() * 9,
       color: ['#ff69b4', '#ffd166', '#06d6a0', '#118ab2', '#ef476f', '#ffffff'][Math.floor(Math.random() * 6)],
       rotation: Math.random() * Math.PI,
-      spin: (Math.random() - 0.5) * 0.25
+      spin: (Math.random() - 0.5) * 0.25,
     });
   }
 }
@@ -404,41 +463,58 @@ function drawConfetti() {
   });
 }
 
+function bigBirthdayBoom() {
+  document.body.classList.remove('big-birthday-boom');
+  void document.body.offsetWidth;
+  document.body.classList.add('big-birthday-boom');
+
+  setTimeout(() => {
+    document.body.classList.remove('big-birthday-boom');
+  }, 2500);
+}
+
 function drawMessage() {
   if (running && !paused) return;
 
   ctx.save();
+
   ctx.fillStyle = 'rgba(60, 35, 20, 0.72)';
   ctx.fillRect(0, 0, W, H);
+
   ctx.fillStyle = '#fff8dc';
   ctx.textAlign = 'center';
 
   if (victory) {
     ctx.font = 'bold 40px Georgia';
     ctx.fillText('Bravo Clem !', W / 2, H / 2 - 102);
+
     ctx.font = 'bold 25px Georgia';
-    ctx.fillText('Tu as sauvé les 5 enfants perdus.', W / 2, H / 2 - 58);
+    ctx.fillText(`Tu as sauvé les ${TARGET_SCORE} enfants perdus.`, W / 2, H / 2 - 58);
     ctx.fillText('Tu es officiellement digne de Marry Poppins.', W / 2, H / 2 - 24);
+
     ctx.font = 'bold 35px Georgia';
     ctx.fillText('Bon anniversaire ! 🎂', W / 2, H / 2 + 34);
+
     ctx.font = '20px Georgia';
     ctx.fillText('La musique d’anniversaire devrait se lancer maintenant.', W / 2, H / 2 + 76);
     ctx.fillText('Clique sur Recommencer pour refaire voler Clem.', W / 2, H / 2 + 108);
   } else if (gameOver) {
     ctx.font = 'bold 44px Georgia';
     ctx.fillText('Oh non Clem !', W / 2, H / 2 - 48);
+
     ctx.font = '24px Georgia';
     ctx.fillText('Les cheminées ont gagné cette manche.', W / 2, H / 2 - 6);
-    ctx.fillText('Recommence et récupère plus d’enfants pour prouver ta valeur.', W / 2, H / 2 + 34);
+    ctx.fillText('Recommence et sauve plus d’enfants pour prouver ta valeur.', W / 2, H / 2 + 34);
   } else if (paused) {
     ctx.font = 'bold 44px Georgia';
     ctx.fillText('Pause', W / 2, H / 2);
   } else {
     ctx.font = 'bold 38px Georgia';
     ctx.fillText('Clem, prête pour ton défi ?', W / 2, H / 2 - 34);
+
     ctx.font = '24px Georgia';
-    ctx.fillText('Récupère les enfants : eux seuls donnent des points.', W / 2, H / 2 + 8);
-    ctx.fillText('Clique sur Commencer.', W / 2, H / 2 + 46);
+    ctx.fillText('Sauve les enfants : eux seuls donnent des points.', W / 2, H / 2 + 8);
+    ctx.fillText('Tape l’écran ou clique pour voler.', W / 2, H / 2 + 46);
   }
 
   ctx.restore();
@@ -457,29 +533,16 @@ function draw() {
 
   drawMessage();
 }
+
 function loop() {
   update();
   draw();
   requestAnimationFrame(loop);
 }
 
-function setLift(value) {
-  lift = value;
-}
-
-window.addEventListener('keydown', e => {
-  if (e.code === 'Space' || e.code === 'ArrowUp') {
-    e.preventDefault();
-    setLift(true);
-    if (!running && !gameOver && !victory) startGame();
-  }
-});
-
-window.addEventListener('keyup', e => {
-  if (e.code === 'Space' || e.code === 'ArrowUp') setLift(false);
-});
-
 function flap() {
+  getAudioContext();
+
   player.vy = -6.8;
   beep(520, 0.04, 'sine', 0.03);
 
@@ -487,6 +550,13 @@ function flap() {
     startGame();
   }
 }
+
+window.addEventListener('keydown', e => {
+  if (e.code === 'Space' || e.code === 'ArrowUp') {
+    e.preventDefault();
+    flap();
+  }
+});
 
 canvas.addEventListener('pointerdown', e => {
   e.preventDefault();
@@ -504,13 +574,3 @@ restartBtn.addEventListener('click', resetGame);
 soundBtn.addEventListener('click', toggleSound);
 
 loop();
-
-function bigBirthdayBoom() {
-  document.body.classList.remove('big-birthday-boom');
-  void document.body.offsetWidth;
-  document.body.classList.add('big-birthday-boom');
-
-  setTimeout(() => {
-    document.body.classList.remove('big-birthday-boom');
-  }, 2500);
-}
