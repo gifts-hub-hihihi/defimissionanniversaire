@@ -210,6 +210,7 @@ function winGame() {
   playVictorySound();
   playBirthdayMusic();
   launchConfetti();
+  bigBirthdayBoom();
 }
 function endGame() {
   if (gameOver || victory) return;
@@ -503,3 +504,13 @@ restartBtn.addEventListener('click', resetGame);
 soundBtn.addEventListener('click', toggleSound);
 
 loop();
+
+function bigBirthdayBoom() {
+  document.body.classList.remove('big-birthday-boom');
+  void document.body.offsetWidth;
+  document.body.classList.add('big-birthday-boom');
+
+  setTimeout(() => {
+    document.body.classList.remove('big-birthday-boom');
+  }, 2500);
+}
