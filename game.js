@@ -478,12 +478,24 @@ window.addEventListener('keyup', e => {
   if (e.code === 'Space' || e.code === 'ArrowUp') setLift(false);
 });
 
-canvas.addEventListener('pointerdown', () => {
-  setLift(true);
-  if (!running && !gameOver && !victory) startGame();
+function flap() {
+  player.vy = -6.8;
+  beep(520, 0.04, 'sine', 0.03);
+
+  if (!running && !gameOver && !victory) {
+    startGame();
+  }
+}
+
+canvas.addEventListener('pointerdown', e => {
+  e.preventDefault();
+  flap();
 });
-canvas.addEventListener('pointerup', () => setLift(false));
-canvas.addEventListener('pointerleave', () => setLift(false));
+
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  flap();
+}, { passive: false });
 
 startBtn.addEventListener('click', startGame);
 pauseBtn.addEventListener('click', togglePause);
