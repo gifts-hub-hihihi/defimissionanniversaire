@@ -28,6 +28,7 @@ let soundEnabled = true;
 let chimneys = [];
 let children = [];
 let audioContext = null;
+let confetti = [];
 
 const player = {
   x: 145,
@@ -208,8 +209,8 @@ function winGame() {
   running = false;
   playVictorySound();
   playBirthdayMusic();
+  launchConfetti();
 }
-
 function endGame() {
   if (gameOver || victory) return;
   gameOver = true;
@@ -363,6 +364,44 @@ function drawChild(x, y) {
 
   ctx.restore();
 }
+function launchConfetti() {
+  confetti = [];
+
+  for (let i = 0; i < 180; i++) {
+    confetti.push({
+      x: W / 2,
+      y: H / 2,
+      vx: (Math.random() - 0.5) * 12,
+      vy: (Math.random() - 0.8) * 12,
+      size: 5 + Math.random() * 8,
+      color: ['#ff69b4', '#ffd166', '#06d6a0', '#118ab2', '#ef476f', '#ffffff'][Math.floor(Math.random() * 6)],
+      rotation: Math.random() * Math.PI,
+      spin: (Math.random() - 0.5) * 0.25
+    });
+  }
+}
+
+function updateConfetti() {
+  confetti.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.18;
+    p.rotation += p.spin;
+  });
+
+  confetti = confetti.filter(p => p.y < H + 30);
+}
+
+function drawConfetti() {
+  confetti.forEach(p => {
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rotation);
+    ctx.fillStyle = p.color;
+    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+    ctx.restore();
+  });
+}
 
 function drawMessage() {
   if (running && !paused) return;
@@ -409,9 +448,14 @@ function draw() {
   drawChildren();
   drawChimneys();
   drawPlayer();
+
+  if (victory) {
+    updateConfetti();
+    drawConfetti();
+  }
+
   drawMessage();
 }
-
 function loop() {
   update();
   draw();
